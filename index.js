@@ -5,10 +5,10 @@ const dotenv = require('dotenv');
 const process = require('process');
 const http = require('http'); 
 
-const studentRoutes = require('./routes/studentRoutes');
-const accessRoutes = require('./routes/accessRouter');
-
 dotenv.config();
+
+
+const userRouter = require('./routes/userRouter');
 
 const app = express();
 
@@ -27,13 +27,9 @@ app.get('/', (req, res) => {
 });
 
 
-app.use('/student', studentRoutes);
-app.use('/access', accessRoutes);
-
-
-
-
 const PORT = process.env.PORT || 3000;
+
+app.use('/api', userRouter);
 
 const server = http.createServer(app);
 const { setWSS } = require('./websocket');
