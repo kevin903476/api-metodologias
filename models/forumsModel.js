@@ -82,16 +82,45 @@ class ForumsModel {
     }
 
     async updateForum(id, forum) {
-        const { titulo, descripcion } = forum;
+        const { titulo, descripcion, es_publico } = forum;
         try {
+            console.log(`Intentando actualizar foro ID ${id}:`, { titulo, descripcion, es_publico });
+            
+            // Validar que es_publico sea un booleano
+            let esPublicoValue = true; // valor por defecto
+            if (es_publico !== undefined && es_publico !== null) {
+                if (typeof es_publico !== 'boolean') {
+                    throw new Error('El campo es_publico debe ser un valor booleano (true o false)');
+                }
+                esPublicoValue = es_publico;
+            }
+
             const result = await db.query(
-                "UPDATE foros SET titulo = ?, descripcion = ? WHERE id = ?", 
-                [titulo, descripcion, id]
+                "CALL sp_actualizar_foro(?, ?, ?, ?)", 
+                [id, titulo, descripcion, esPublicoValue]
             );
+            
+            console.log(`Actualización completada mediante stored procedure`);
             return result;
         } catch (error) {
-            console.error("Error al actualizar el foro:", error);
-            throw error;
+            console.error(`Error crítico al actualizar foro ID ${id}:`, error);
+            console.error("Detalles del error de actualización:", {
+                message: error.message,
+                code: error.code,
+                errno: error.errno,
+                sqlState: error.sqlState,
+                parametros: { id, titulo, descripcion, es_publico }
+            });
+            
+            // Propagar errores específicos del stored procedure
+            if (error.message.includes('El foro especificado no existe')) {
+                throw new Error(`El foro especificado no existe`);
+            }
+            if (error.message.includes('Ya existe otro foro con ese título')) {
+                throw new Error(`Ya existe otro foro con ese título`);
+            }
+            
+            throw new Error(`Error al actualizar el foro ID ${id} en la base de datos: ${error.message}`);
         }
     }
 

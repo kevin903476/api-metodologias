@@ -91,32 +91,66 @@ const createForum = async (req, res) => {
 const updateForum = async (req, res) => {
     try {
         const { id } = req.params;
-        const { titulo, descripcion } = req.body;
+        const { titulo, descripcion, es_publico } = req.body;
 
         if (!titulo) {
             return res.status(400).json({
                 success: false,
-                message: 'Título es obligatorio'
+                message: 'El campo "titulo" es obligatorio para actualizar el foro.'
             });
+        }
+
+        // Validar es_publico si se proporciona
+        if (es_publico !== undefined && es_publico !== null) {
+            if (typeof es_publico !== 'boolean') {
+                return res.status(400).json({
+                    success: false,
+                    message: 'El campo "es_publico" debe ser un valor booleano: true o false.'
+                });
+            }
         }
 
         const forumData = {
             titulo,
-            descripcion: descripcion || null
+            descripcion: descripcion || null,
+            es_publico: es_publico
         };
 
         const result = await ForumsService.updateForum(id, forumData);
         
+        // Construir mensaje dinámico basado en los campos actualizados
+        let updateMessage = `Foro con ID ${id} actualizado exitosamente. Nuevo título: "${titulo}"`;
+        if (es_publico !== undefined && es_publico !== null) {
+            const esPublicoText = es_publico ? 'público' : 'privado';
+            updateMessage += `, ahora es ${esPublicoText}`;
+        }
+        
         return res.status(200).json({
             success: true,
-            message: 'Foro actualizado correctamente',
+            message: updateMessage,
             data: result
         });
     } catch (error) {
         console.error('Error al actualizar el foro:', error);
+        
+        // Manejo específico de errores del stored procedure
+        if (error.message && error.message.includes('El foro especificado no existe')) {
+            return res.status(404).json({
+                success: false,
+                message: `No se encontró ningún foro con el ID ${id} para actualizar.`
+            });
+        }
+        
+        if (error.message && error.message.includes('Ya existe otro foro con ese título')) {
+            return res.status(409).json({
+                success: false,
+                message: `Ya existe otro foro con el título "${req.body.titulo}". Por favor, elija un título diferente.`
+            });
+        }
+        
         return res.status(500).json({
             success: false,
-            message: 'Error al actualizar el foro'
+            message: 'Error interno del servidor al actualizar el foro. Intente nuevamente.'
         });
     }
 };
