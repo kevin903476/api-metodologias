@@ -31,9 +31,9 @@ class ForumsModel {
         }
     }
 
-    async findByTitle(titulo) {
+    async findById(id) {
         try {
-            const [rows] = await db.query(`
+            const result = await db.query(`
                 SELECT 
                     f.id,
                     f.titulo,
@@ -47,12 +47,26 @@ class ForumsModel {
                     f.creado_en
                 FROM foros f
                 INNER JOIN usuarios u ON f.creado_por = u.id
-                WHERE f.titulo = ?
-            `, [titulo]);
-            return rows;
+                WHERE f.id = ?
+            `, [id]);
+            
+            console.log(`Búsqueda por ID ${id} - Resultado:`, result[0] ? 'Encontrado' : 'No encontrado');
+            if (result.length > 0) {
+                console.log(`Foro encontrado: "${result[0].titulo}"`);
+            }
+            
+            return result[0]; // Retorna el primer elemento del array de resultados
         } catch (error) {
-            console.error("Error al buscar el foro por título:", error);
-            throw error;
+            console.error(`Error crítico al buscar foro por ID ${id}:`, error);
+            console.error("Detalles del error SQL:", {
+                message: error.message,
+                code: error.code,
+                errno: error.errno,
+                sqlState: error.sqlState,
+                parametroBusqueda: id,
+                tipoParametro: typeof id
+            });
+            throw new Error(`Error en la base de datos al buscar el foro con ID ${id}: ${error.message}`);
         }
     }
 

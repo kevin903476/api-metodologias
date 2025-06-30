@@ -12,12 +12,12 @@ class ForumsService {
         }
     }
 
-    async findByTitle(titulo) {
+    async findById(id) {
         try {
-            const result = await ForumsModel.findByTitle(titulo);
+            const result = await ForumsModel.findById(id);
             return result;
         } catch (error) {
-            console.error("Error en findByTitle:", error);
+            console.error("Error en findById:", error);
             throw error;
         }
     }
