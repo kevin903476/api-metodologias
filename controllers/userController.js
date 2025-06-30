@@ -42,7 +42,7 @@ const loginUser = async (req, res) => {
     }
 
     const tokenPayload = {
-      id: user.id_usuario,
+      id: user.id,
       correo: user.correo,
       nombre: user.nombre,
       rol_global: user.rol_global,
