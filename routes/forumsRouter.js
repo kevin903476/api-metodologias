@@ -6,8 +6,8 @@ const forumsController = require('../controllers/forumsController');
 // GET /forums - Obtener todos los foros
 router.get('/forums', forumsController.getAllForums);
 
-// GET /forums/title/:titulo - Buscar foro por título
-router.get('/forums/title/:titulo', forumsController.getForumByTitle);
+// GET /forums/:id - Buscar foro por ID
+router.get('/forums/:id', forumsController.getForumById);
 
 // POST /forums - Crear un nuevo foro
 router.post('/forums', forumsController.createForum);

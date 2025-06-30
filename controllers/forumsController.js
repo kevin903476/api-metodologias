@@ -18,37 +18,37 @@ const getAllForums = async (req, res) => {
     }
 };
 
-const getForumByTitle = async (req, res) => {
+const getForumById = async (req, res) => {
     try {
-        const { titulo } = req.params;
+        const { id } = req.params;
 
-        // Validación
-        if (!titulo) {
+        // Validación básica
+        if (!id || isNaN(id)) {
             return res.status(400).json({
                 success: false,
-                message: 'Título es obligatorio'
+                message: 'El parámetro "id" debe ser un número válido para identificar el foro.'
             });
         }
 
-        const forum = await ForumsService.findByTitle(titulo);
+        const forum = await ForumsService.findById(id);
         
-        if (!forum || forum.length === 0) {
+        if (!forum) {
             return res.status(404).json({
                 success: false,
-                message: 'Foro no encontrado'
+                message: `No se encontró ningún foro con el ID ${id}. Verifique que el ID sea correcto.`
             });
         }
 
         return res.status(200).json({
             success: true,
-            message: 'Foro encontrado correctamente',
+            message: `Foro encontrado exitosamente. ID: ${id} - Título: "${forum.titulo}"`,
             data: forum
         });
     } catch (error) {
-        console.error('Error al buscar el foro por título:', error);
+        console.error('Error al buscar el foro por ID:', error);
         return res.status(500).json({
             success: false,
-            message: 'Error al buscar el foro'
+            message: 'Error interno del servidor al buscar el foro por ID. Intente nuevamente.'
         });
     }
 }
@@ -144,7 +144,7 @@ const deleteForum = async (req, res) => {
 
 module.exports = {
     getAllForums,
-    getForumByTitle,
+    getForumById,
     createForum,
     updateForum,
     deleteForum,
