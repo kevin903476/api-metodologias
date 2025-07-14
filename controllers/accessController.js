@@ -1,6 +1,6 @@
 //@ts-check
 const AccessService = require("../services/accessService");
-const { getWSS } = require('../websocket');
+const { emitToPizarra } = require('../websocket');
 
 
 const getAllAccess = async (req, res) => {
@@ -76,18 +76,14 @@ async function registerAccess(req, res) {
   try {
     const result = await AccessService.registerAccess(dni);
 
-    const wss = getWSS();
-    if (wss) {
-      console.log("Clientes WebSocket conectados:", wss.clients.size);
-      wss.clients.forEach(client => {
-        if (client.readyState === 1) {
-          console.log("Enviando mensaje a cliente WebSocket");
-          client.send(JSON.stringify({ type: "updateTodayAccess" }));
-        }
-      });
-    } else {
-      console.warn("WebSocket server no inicializado");
-    }
+    // Emitir evento de actualización usando Socket.IO
+    emitToPizarra('updateTodayAccess', {
+      message: 'Nuevo acceso registrado',
+      dni: dni,
+      timestamp: new Date().toISOString()
+    });
+
+    console.log(`Acceso registrado para DNI: ${dni} - Evento emitido via Socket.IO`);
 
     return res.status(200).json({
       success: true,
@@ -132,5 +128,5 @@ async function getAccessByDate(req, res) {
 
 
 module.exports = {
-  getAllAccess, getTodayAccess, getAccessByDni, registerAccess,getWeekAccess,getAccessByDate
+  getAllAccess, getTodayAccess, getAccessByDni, registerAccess, getWeekAccess, getAccessByDate
 };

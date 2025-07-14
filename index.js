@@ -10,6 +10,7 @@ dotenv.config();
 
 const userRouter = require('./routes/userRouter');
 const forumsRouter = require('./routes/forumsRouter');
+const boardRouter = require('./routes/boardRoutes'); 
 
 const app = express();
 
@@ -32,10 +33,11 @@ const PORT = process.env.PORT || 3000;
 
 app.use('/api', userRouter);
 app.use('/api', forumsRouter);
+app.use('/api', boardRouter);
 
 const server = http.createServer(app);
-const { setWSS } = require('./websocket');
-setWSS(server); // inicializa el WebSocket
+const { setSocketIO } = require('./websocket');
+setSocketIO(server);
 
 server.listen(PORT, () => {
   console.log(`Servidor corriendo en el puerto ${PORT}`);
