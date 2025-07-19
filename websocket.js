@@ -133,9 +133,12 @@ function stopSocketIO() {
 }
 
 // Función para emitir eventos desde otros módulos
-function emitToPizarra(event, data) {
+function emitToPizarra(room, event, data) {
   if (io) {
-    io.to('pizarra').emit(event, data);
+    io.to(room).emit(event, data);
+    console.log(`Evento ${event} emitido a la sala ${room}:`, data);
+  } else {
+    console.warn('Socket.IO no está inicializado');
   }
 }
 
