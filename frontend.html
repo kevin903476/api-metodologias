@@ -784,9 +784,15 @@
         }
 
         function handleLogout() {
+            // Salir de todas las salas antes de desconectar
+            if (socket && socket.connected && currentBoard) {
+                socket.emit('leaveBoard', currentBoard.id);
+            }
+            
             localStorage.removeItem('token');
             localStorage.removeItem('user');
             currentUser = null;
+            currentBoard = null;
             disconnectSocket();
             showLoginSection();
             showNotification('Sesión cerrada', 'success');
@@ -883,6 +889,12 @@
         }
 
         function showDashboard() {
+            // Salir de la pizarra actual al volver al dashboard
+            if (socket && socket.connected && currentBoard) {
+                socket.emit('leaveBoard', currentBoard.id);
+                currentBoard = null;
+            }
+            
             elements.loginSection.classList.add('hidden');
             elements.dashboardSection.classList.remove('hidden');
             elements.boardSection.classList.add('hidden');
@@ -897,6 +909,11 @@
         }
 
         function showBoard(board) {
+            // Salir de la pizarra anterior si existe
+            if (socket && socket.connected && currentBoard && currentBoard.id !== board.id) {
+                socket.emit('leaveBoard', currentBoard.id);
+            }
+            
             currentBoard = board;
             elements.loginSection.classList.add('hidden');
             elements.dashboardSection.classList.add('hidden');
@@ -1030,8 +1047,10 @@
                     const cards = result.success && result.data ? result.data : [];
                     updateBoardCanvas(cards);
                     
+                    // Unirse a la sala específica de esta pizarra
                     if (socket && socket.connected) {
                         socket.emit('joinBoard', boardId);
+                        console.log(`Unido a la sala de la pizarra ${boardId}`);
                     }
                 } else {
                     console.error('Error loading board cards:', response.status);
@@ -1063,10 +1082,11 @@
         }
 
         function handleCardAdded(card) {
+            // Solo agregar si estamos viendo la pizarra correcta
             if (currentBoard && card.pizarra_id === currentBoard.id) {
                 const cardElement = createCardElement(card);
                 elements.boardCanvas.appendChild(cardElement);
-                showNotification('Nueva tarjeta agregada', 'success');
+                showNotification(`Nueva tarjeta: ${card.titulo}`, 'success');
             }
         }
 
@@ -1162,13 +1182,14 @@
             div.className = 'card-item';
             div.setAttribute('data-card-id', card.id);
             
-            const createdAt = new Date(card.created_at || Date.now()).toLocaleDateString();
+            const createdAt = new Date(card.timestamp || card.created_at || Date.now()).toLocaleDateString();
+            const addedByName = card.addedBy?.userName || card.usuario_nombre || currentUser?.nombre || 'Usuario';
             
             div.innerHTML = `
                 <h4>${card.titulo}</h4>
                 <p>${card.contenido}</p>
                 <div class="card-meta">
-                    <span>Por: ${card.usuario_nombre || currentUser?.nombre || 'Usuario'}</span>
+                    <span>Por: ${addedByName}</span>
                     <span>${createdAt}</span>
                 </div>
             `;
@@ -1291,8 +1312,21 @@
                     if (result.success) {
                         showNotification('Tarjeta agregada exitosamente', 'success');
                         closeModals();
-                        // Card will be added via socket event or reload
-                        loadBoardCards(currentBoard.id);
+                        
+                        // Emitir evento de socket para tiempo real
+                        if (socket && socket.connected) {
+                            socket.emit('addCard', {
+                                id: result.data.id || Date.now(),
+                                titulo: formData.titulo,
+                                contenido: formData.contenido,
+                                pizarra_id: formData.pizarra_id,
+                                created_at: new Date().toISOString(),
+                                usuario_nombre: currentUser?.nombre || 'Usuario'
+                            });
+                        }
+                        
+                        // NO recargar manualmente - la tarjeta se agregará por socket
+                        // loadBoardCards(currentBoard.id);
                     } else {
                         showNotification(result.message || 'Error agregando tarjeta', 'error');
                     }

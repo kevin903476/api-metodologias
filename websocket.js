@@ -45,6 +45,19 @@ function setSocketIO(server) {
     // Unir al usuario a la sala general de la pizarra
     socket.join('pizarra');
 
+    // Manejar unión a pizarras específicas
+    socket.on('joinBoard', (boardId) => {
+      const roomName = `pizarra_${boardId}`;
+      socket.join(roomName);
+      console.log(`Usuario ${socket.userName} se unió a la sala ${roomName}`);
+    });
+
+    socket.on('leaveBoard', (boardId) => {
+      const roomName = `pizarra_${boardId}`;
+      socket.leave(roomName);
+      console.log(`Usuario ${socket.userName} salió de la sala ${roomName}`);
+    });
+
     // Enviar información del usuario conectado a otros clientes
     socket.to('pizarra').emit('userConnected', {
       userId: socket.userId,
@@ -66,8 +79,12 @@ function setSocketIO(server) {
 
       console.log(`Nueva tarjeta añadida por ${socket.userName}:`, cardWithUser);
       
-      // Emitir a todos los clientes en la sala pizarra (incluyendo el emisor)
-      io.to('pizarra').emit('cardAdded', cardWithUser);
+      // Emitir a la sala específica de la pizarra
+      const roomName = `pizarra_${cardData.pizarra_id}`;
+      io.to(roomName).emit('cardAdded', cardWithUser);
+      
+      // También emitir a la sala general para notificaciones
+      io.to('pizarra').emit('cardAddedGlobal', cardWithUser);
     });
 
     // Escuchar cuando se elimina una tarjeta

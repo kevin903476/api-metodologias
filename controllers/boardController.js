@@ -68,8 +68,6 @@ const addCardToPizarra = async (req, res) => {
   try {
     const { pizarra_id, titulo, contenido } = req.body;
     const userId = req.user.id; 
-    const userName = req.user.nombre;
-    const userEmail = req.user.correo;
     
     // Guardar en la base de datos
     const tarjetaData = await BoardService.createTarjeta({
@@ -79,24 +77,10 @@ const addCardToPizarra = async (req, res) => {
       creado_por: userId
     });
 
-    // Preparar datos para Socket.IO
-    const cardData = {
-      id: tarjetaData.id,
-      title: tarjetaData.titulo,
-      content: tarjetaData.contenido,
-      pizarra_id: tarjetaData.pizarra_id,
-      addedBy: {
-        userId,
-        userName,
-        userEmail
-      },
-      timestamp: tarjetaData.creado_en
-    };
+    // NO emitir aquí - el evento se emite desde websocket.js cuando el frontend hace socket.emit('addCard')
+    // La emisión duplicada se evita para que el manejo sea consistente desde websocket.js
 
-    // Emitir el evento a todos los clientes conectados a esta pizarra
-    emitToPizarra(`pizarra_${pizarra_id}`, 'cardAdded', cardData);
-
-    console.log(`Nueva tarjeta añadida por ${userName} en pizarra ${pizarra_id}:`, cardData);
+    console.log(`Tarjeta guardada en BD - ID: ${tarjetaData.id}, Pizarra: ${pizarra_id}`);
 
     return res.status(200).json({
       success: true,
