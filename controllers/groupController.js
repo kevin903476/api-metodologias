@@ -51,8 +51,9 @@ const getGroupById = async (req, res) => {
 
 const createGroup = async (req, res) => {
     try {
-        const { name, description } = req.body;
-        const createdBy = req.user?.nombre || req.user?.email || 'desconocido';
+        const { description } = req.body;
+        const name = req.user?.nombre;
+        const createdBy = req.user?.id || req.user?.correo || 'desconocido';
 
         if (!name || !createdBy) {
             return res.status(400).json({
@@ -61,9 +62,9 @@ const createGroup = async (req, res) => {
             });
         }
         const groupData = {
-            name,
             description: description || null,
-            createdBy
+            name,
+            createdBy,
         };
         const result = await GroupModel.createGroup(groupData);
         return res.status(201).json({
