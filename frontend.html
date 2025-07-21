@@ -1,0 +1,1395 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Metodologías - Tiempo Real</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --success-color: #27ae60;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --light-bg: #ecf0f1;
+            --dark-bg: #34495e;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-bg);
+            color: var(--secondary-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--card-shadow);
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 300;
+        }
+
+        .header h1 i {
+            margin-right: 0.5rem;
+            color: #f1c40f;
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .btn-small {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+        }
+
+        /* Utility Classes */
+        .hidden {
+            display: none !important;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main {
+            flex: 1;
+            padding: 2rem;
+        }
+
+        /* Auth Section */
+        .auth-section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: calc(100vh - 120px);
+        }
+
+        .auth-form {
+            background: white;
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .auth-form h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--secondary-color);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--secondary-color);
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        /* Dashboard */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            background: var(--secondary-color);
+            color: white;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-header h3 {
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+
+        .card-header i {
+            margin-right: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--success-color);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .metric {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-label {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Access List */
+        .access-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .access-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem;
+            border-bottom: 1px solid #eee;
+            animation: slideInRight 0.5s ease;
+        }
+
+        .access-item:last-child {
+            border-bottom: none;
+        }
+
+        .access-item.new {
+            background-color: #e8f8f5;
+            border-left: 4px solid var(--success-color);
+        }
+
+        .access-time {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Board Styles */
+        .boards-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .board-item {
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .board-item:hover {
+            background-color: #f8f9fa;
+            border-color: var(--primary-color);
+        }
+
+        .board-item h4 {
+            margin-bottom: 0.5rem;
+            color: var(--secondary-color);
+        }
+
+        .board-item p {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
+        /* Board View */
+        .board-view {
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 120px);
+        }
+
+        .board-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 2px solid #ddd;
+            margin-bottom: 2rem;
+        }
+
+        .board-canvas {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+            overflow-y: auto;
+        }
+
+        .card-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-color);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.5s ease;
+        }
+
+        .card-item h4 {
+            margin-bottom: 0.5rem;
+            color: var(--secondary-color);
+        }
+
+        .card-item p {
+            color: #7f8c8d;
+            line-height: 1.5;
+        }
+
+        .card-item .card-meta {
+            margin-top: 1rem;
+            font-size: 0.8rem;
+            color: #95a5a6;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Users List */
+        .users-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .user-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            border-radius: 4px;
+            background-color: #f8f9fa;
+        }
+
+        .user-status {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--success-color);
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #7f8c8d;
+        }
+
+        /* Notifications */
+        .notifications {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 2000;
+        }
+
+        .notification {
+            background: white;
+            padding: 1rem 1.5rem;
+            border-radius: 6px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 0.5rem;
+            border-left: 4px solid var(--primary-color);
+            animation: slideInFromRight 0.3s ease;
+        }
+
+        .notification.success {
+            border-left-color: var(--success-color);
+        }
+
+        .notification.error {
+            border-left-color: var(--danger-color);
+        }
+
+        .notification.warning {
+            border-left-color: var(--warning-color);
+        }
+
+        @keyframes slideInFromRight {
+            from { transform: translateX(300px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Connection Status */
+        .connection-status {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .connection-status.connected {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .connection-status.disconnected {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .connection-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: currentColor;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .main {
+                padding: 1rem;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .board-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .board-canvas {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1><i class="fas fa-chalkboard-teacher"></i> Sistema Metodologías</h1>
+            <nav class="nav">
+                <button id="loginBtn" class="btn btn-primary">Iniciar Sesión</button>
+                <div id="userMenu" class="user-menu hidden">
+                    <span id="userName"></span>
+                    <button id="logoutBtn" class="btn btn-secondary">Cerrar Sesión</button>
+                </div>
+            </nav>
+        </header>
+
+        <main class="main">
+            <!-- Login Section -->
+            <section id="loginSection" class="auth-section">
+                <div class="auth-form">
+                    <h2>Iniciar Sesión</h2>
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <label for="correo">Correo Electrónico:</label>
+                            <input type="email" id="correo" required placeholder="kevin903476@gmail.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="clave">Contraseña:</label>
+                            <input type="password" id="clave" required placeholder="Tu contraseña">
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">
+                            <i class="fas fa-sign-in-alt"></i> Ingresar
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Dashboard Section -->
+            <section id="dashboardSection" class="dashboard hidden">
+                <div class="dashboard-grid">
+                    <!-- Accesos en Tiempo Real -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-door-open"></i> Accesos de Hoy</h3>
+                            <div class="status-indicator" id="accessStatus"></div>
+                        </div>
+                        <div class="card-body">
+                            <div id="todayAccessCount" class="metric">0</div>
+                            <div class="metric-label">Accesos registrados</div>
+                            <div id="accessList" class="access-list"></div>
+                        </div>
+                    </div>
+
+                    <!-- Pizarras Colaborativas -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-clipboard"></i> Pizarras</h3>
+                            <button id="createBoardBtn" class="btn btn-small btn-primary">
+                                <i class="fas fa-plus"></i> Nueva
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div id="boardsList" class="boards-list"></div>
+                        </div>
+                    </div>
+
+                    <!-- Usuarios Conectados -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-users"></i> Usuarios Conectados</h3>
+                        </div>
+                        <div class="card-body">
+                            <div id="connectedUsers" class="users-list"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Board Section -->
+            <section id="boardSection" class="board-view hidden">
+                <div class="board-header">
+                    <button id="backToDashboard" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Volver
+                    </button>
+                    <h2 id="boardTitle">Pizarra Colaborativa</h2>
+                    <button id="addCardBtn" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Agregar Tarjeta
+                    </button>
+                </div>
+                <div id="boardCanvas" class="board-canvas"></div>
+            </section>
+        </main>
+
+        <!-- Connection Status -->
+        <div id="connectionStatus" class="connection-status disconnected">
+            <div class="connection-indicator"></div>
+            <span>Desconectado</span>
+        </div>
+
+        <!-- Notifications Area -->
+        <div id="notifications" class="notifications"></div>
+    </div>
+
+    <!-- Create Board Modal -->
+    <div id="createBoardModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Crear Nueva Pizarra</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="createBoardForm">
+                <div class="form-group">
+                    <label for="boardTitleInput">Título:</label>
+                    <input type="text" id="boardTitleInput" required placeholder="Título de la pizarra">
+                </div>
+                <div class="form-group">
+                    <label for="boardDescInput">Descripción:</label>
+                    <textarea id="boardDescInput" rows="3" placeholder="Descripción opcional"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="boardGroupSelect">Grupo:</label>
+                    <select id="boardGroupSelect" required>
+                        <option value="1">Grupo 1</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    <i class="fas fa-plus"></i> Crear Pizarra
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Card Modal -->
+    <div id="addCardModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Agregar Tarjeta</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="addCardForm">
+                <div class="form-group">
+                    <label for="cardTitleInput">Título:</label>
+                    <input type="text" id="cardTitleInput" required placeholder="Título de la tarjeta">
+                </div>
+                <div class="form-group">
+                    <label for="cardContentInput">Contenido:</label>
+                    <textarea id="cardContentInput" rows="4" required placeholder="Contenido de la tarjeta"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    <i class="fas fa-plus"></i> Agregar Tarjeta
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
+    <script>
+        // Configuración actualizada para Railway
+        const API_BASE_URL = 'https://api-metodologias-production.up.railway.app/api';
+        const SOCKET_URL = 'https://api-metodologias-production.up.railway.app';
+        let socket = null;
+        let currentUser = null;
+        let currentBoard = null;
+
+        // Elementos DOM
+        const elements = {
+            loginSection: document.getElementById('loginSection'),
+            dashboardSection: document.getElementById('dashboardSection'),
+            boardSection: document.getElementById('boardSection'),
+            loginBtn: document.getElementById('loginBtn'),
+            logoutBtn: document.getElementById('logoutBtn'),
+            userMenu: document.getElementById('userMenu'),
+            userName: document.getElementById('userName'),
+            loginForm: document.getElementById('loginForm'),
+            createBoardBtn: document.getElementById('createBoardBtn'),
+            createBoardModal: document.getElementById('createBoardModal'),
+            createBoardForm: document.getElementById('createBoardForm'),
+            addCardModal: document.getElementById('addCardModal'),
+            addCardForm: document.getElementById('addCardForm'),
+            addCardBtn: document.getElementById('addCardBtn'),
+            backToDashboard: document.getElementById('backToDashboard'),
+            boardTitle: document.getElementById('boardTitle'),
+            connectionStatus: document.getElementById('connectionStatus'),
+            notifications: document.getElementById('notifications'),
+            todayAccessCount: document.getElementById('todayAccessCount'),
+            accessList: document.getElementById('accessList'),
+            boardsList: document.getElementById('boardsList'),
+            connectedUsers: document.getElementById('connectedUsers'),
+            boardCanvas: document.getElementById('boardCanvas')
+        };
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+        });
+
+        function initializeApp() {
+            setupEventListeners();
+            checkAuthToken();
+            loadGroups();
+        }
+
+        function setupEventListeners() {
+            // Auth events
+            elements.loginForm.addEventListener('submit', handleLogin);
+            elements.loginBtn.addEventListener('click', showLoginSection);
+            elements.logoutBtn.addEventListener('click', handleLogout);
+
+            // Board events
+            elements.createBoardBtn.addEventListener('click', showCreateBoardModal);
+            elements.createBoardForm.addEventListener('submit', handleCreateBoard);
+            elements.addCardBtn.addEventListener('click', showAddCardModal);
+            elements.addCardForm.addEventListener('submit', handleAddCard);
+            elements.backToDashboard.addEventListener('click', showDashboard);
+
+            // Modal events
+            document.querySelectorAll('.modal-close').forEach(btn => {
+                btn.addEventListener('click', closeModals);
+            });
+
+            // Close modals when clicking outside
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('modal')) {
+                    closeModals();
+                }
+            });
+        }
+
+        // Authentication - Actualizado para tu API
+        async function handleLogin(e) {
+            e.preventDefault();
+            const correo = document.getElementById('correo').value;
+            const clave = document.getElementById('clave').value;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ correo, clave })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.data));
+                    currentUser = data.data;
+                    showNotification('Inicio de sesión exitoso', 'success');
+                    showDashboard();
+                    connectSocket();
+                } else {
+                    showNotification(data.message || data.error || 'Error en el inicio de sesión', 'error');
+                }
+            } catch (error) {
+                showNotification('Error de conexión', 'error');
+                console.error('Login error:', error);
+            }
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            currentUser = null;
+            disconnectSocket();
+            showLoginSection();
+            showNotification('Sesión cerrada', 'success');
+        }
+
+        function checkAuthToken() {
+            const token = localStorage.getItem('token');
+            const user = localStorage.getItem('user');
+
+            if (token && user && user !== 'undefined') {
+                try {
+                    currentUser = JSON.parse(user);
+                    showDashboard();
+                    connectSocket();
+                } catch (error) {
+                    console.error('Error parsing user data:', error);
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                }
+            }
+        }
+
+        // Socket Connection - Actualizado para Railway
+        function connectSocket() {
+            if (socket) return;
+            
+            // Verificar si Socket.IO está disponible
+            if (typeof io === 'undefined') {
+                console.error('Socket.IO no está disponible');
+                showNotification('Error: Socket.IO no cargado', 'error');
+                return;
+            }
+
+            // Para Railway, usamos la URL completa
+            socket = io(SOCKET_URL, {
+                auth: {
+                    token: localStorage.getItem('token')
+                },
+                transports: ['websocket', 'polling']
+            });
+
+            socket.on('connect', () => {
+                updateConnectionStatus(true);
+                showNotification('Conectado al servidor', 'success');
+                console.log('Socket conectado:', socket.id);
+            });
+
+            socket.on('disconnect', () => {
+                updateConnectionStatus(false);
+                showNotification('Desconectado del servidor', 'error');
+            });
+
+            socket.on('connect_error', (error) => {
+                console.error('Error de conexión Socket:', error);
+                updateConnectionStatus(false);
+            });
+
+            socket.on('newAccess', (access) => {
+                handleNewAccess(access);
+            });
+
+            socket.on('boardUpdate', (board) => {
+                handleBoardUpdate(board);
+            });
+
+            socket.on('cardAdded', (card) => {
+                handleCardAdded(card);
+            });
+
+            socket.on('usersUpdate', (users) => {
+                updateConnectedUsers(users);
+            });
+
+            socket.on('error', (error) => {
+                showNotification(error.message || 'Error del servidor', 'error');
+            });
+        }
+
+        function disconnectSocket() {
+            if (socket) {
+                socket.disconnect();
+                socket = null;
+                updateConnectionStatus(false);
+            }
+        }
+
+        // UI Navigation
+        function showLoginSection() {
+            elements.loginSection.classList.remove('hidden');
+            elements.dashboardSection.classList.add('hidden');
+            elements.boardSection.classList.add('hidden');
+            elements.loginBtn.classList.remove('hidden');
+            elements.userMenu.classList.add('hidden');
+        }
+
+        function showDashboard() {
+            elements.loginSection.classList.add('hidden');
+            elements.dashboardSection.classList.remove('hidden');
+            elements.boardSection.classList.add('hidden');
+            elements.loginBtn.classList.add('hidden');
+            elements.userMenu.classList.remove('hidden');
+            
+            if (currentUser) {
+                elements.userName.textContent = currentUser.nombre || currentUser.correo;
+            }
+
+            loadDashboardData();
+        }
+
+        function showBoard(board) {
+            currentBoard = board;
+            elements.loginSection.classList.add('hidden');
+            elements.dashboardSection.classList.add('hidden');
+            elements.boardSection.classList.remove('hidden');
+            elements.boardTitle.textContent = board.titulo;
+            
+            // Intentar cargar tarjetas reales, si falla cargar demo
+            loadBoardCards(board.id).catch(() => {
+                loadDemoBoardCards();
+            });
+        }
+
+        // Data Loading - Actualizado para tu API
+        async function loadDashboardData() {
+            let hasErrors = false;
+            
+            try {
+                await loadTodayAccesses();
+            } catch (error) {
+                hasErrors = true;
+                console.error('Error loading accesses:', error);
+            }
+            
+            try {
+                await loadBoards();
+            } catch (error) {
+                hasErrors = true;
+                console.error('Error loading boards:', error);
+            }
+
+            // Si hay errores, cargar datos de demostración
+            if (hasErrors) {
+                showNotification('Cargando datos de demostración...', 'warning');
+                setTimeout(() => {
+                    loadDemoData();
+                }, 1000);
+            }
+
+            if (socket && socket.connected) {
+                socket.emit('joinDashboard');
+            }
+        }
+
+        async function loadTodayAccesses() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/getTodayAccess`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    // La respuesta tiene estructura { success, message, data }
+                    const accesses = result.success && result.data ? result.data : [];
+                    updateAccessList(accesses);
+                } else {
+                    console.error('Error loading accesses:', response.status);
+                    updateAccessList([]);
+                }
+            } catch (error) {
+                console.error('Error loading today accesses:', error);
+                updateAccessList([]);
+            }
+        }
+
+        async function loadBoards() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/pizarras`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    // La respuesta tiene estructura { success, message, data }
+                    const boards = result.success && result.data ? result.data : [];
+                    updateBoardsList(boards);
+                } else {
+                    console.error('Error loading boards:', response.status);
+                    updateBoardsList([]);
+                }
+            } catch (error) {
+                console.error('Error loading boards:', error);
+                updateBoardsList([]);
+            }
+        }
+
+        async function loadGroups() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/grupos`);
+                if (response.ok) {
+                    const grupos = await response.json();
+                    const select = document.getElementById('boardGroupSelect');
+                    select.innerHTML = '<option value="1">Seleccionar grupo...</option>';
+                    
+                    grupos.forEach(grupo => {
+                        const option = document.createElement('option');
+                        option.value = grupo.id;
+                        option.textContent = grupo.nombre;
+                        select.appendChild(option);
+                    });
+                    if( grupos.length === 0) {
+                        select.innerHTML = ' <option value="1">Grupo 1</option>';
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading groups:', error);
+                // Agregar opciones por defecto
+                const select = document.getElementById('boardGroupSelect');
+                select.innerHTML = `
+                    <option value="">Seleccionar grupo...</option>
+                    <option value="1">Grupo 1</option>
+                    <option value="2">Grupo 2</option>
+                `;
+            }
+        }
+
+        async function loadBoardCards(boardId) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/pizarras/${boardId}/tarjetas`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    // La respuesta tiene estructura { success, message, data }
+                    const cards = result.success && result.data ? result.data : [];
+                    updateBoardCanvas(cards);
+                    
+                    if (socket && socket.connected) {
+                        socket.emit('joinBoard', boardId);
+                    }
+                } else {
+                    console.error('Error loading board cards:', response.status);
+                    updateBoardCanvas([]);
+                }
+            } catch (error) {
+                console.error('Error loading board cards:', error);
+                updateBoardCanvas([]);
+            }
+        }
+
+        // Real-time Event Handlers
+        function handleNewAccess(access) {
+            const accessItem = createAccessItem(access, true);
+            elements.accessList.insertBefore(accessItem, elements.accessList.firstChild);
+            
+            const currentCount = parseInt(elements.todayAccessCount.textContent);
+            elements.todayAccessCount.textContent = currentCount + 1;
+            
+            showNotification(`Nuevo acceso: ${access.nombre}`, 'success');
+        }
+
+        function handleBoardUpdate(board) {
+            const boardElement = document.querySelector(`[data-board-id="${board.id}"]`);
+            if (boardElement) {
+                boardElement.querySelector('h4').textContent = board.titulo;
+                boardElement.querySelector('p').textContent = board.descripcion || 'Sin descripción';
+            }
+        }
+
+        function handleCardAdded(card) {
+            if (currentBoard && card.pizarra_id === currentBoard.id) {
+                const cardElement = createCardElement(card);
+                elements.boardCanvas.appendChild(cardElement);
+                showNotification('Nueva tarjeta agregada', 'success');
+            }
+        }
+
+        // UI Update Functions
+        function updateAccessList(accesses) {
+            elements.accessList.innerHTML = '';
+            
+            // Asegurar que accesses sea un array válido
+            if (!accesses || !Array.isArray(accesses)) {
+                accesses = [];
+            }
+            
+            elements.todayAccessCount.textContent = accesses.length;
+            
+            if (accesses.length === 0) {
+                elements.accessList.innerHTML = '<p class="text-center" style="color: #7f8c8d;">No hay accesos registrados hoy</p>';
+                return;
+            }
+            
+            accesses.forEach(access => {
+                const accessItem = createAccessItem(access);
+                elements.accessList.appendChild(accessItem);
+            });
+        }
+
+        function createAccessItem(access, isNew = false) {
+            const div = document.createElement('div');
+            div.className = `access-item${isNew ? ' new' : ''}`;
+            
+            const time = new Date(access.fecha_hora || access.created_at || Date.now()).toLocaleTimeString();
+            
+            div.innerHTML = `
+                <div>
+                    <strong>${access.nombre || 'Usuario'}</strong>
+                    <div class="access-time">${time}</div>
+                </div>
+                <i class="fas fa-sign-in-alt" style="color: var(--success-color);"></i>
+            `;
+            
+            return div;
+        }
+
+        function updateBoardsList(boards) {
+            elements.boardsList.innerHTML = '';
+            
+            // Asegurar que boards sea un array válido
+            if (!boards || !Array.isArray(boards) || boards.length === 0) {
+                elements.boardsList.innerHTML = '<p class="text-center" style="color: #7f8c8d;">No hay pizarras disponibles</p>';
+                return;
+            }
+            
+            boards.forEach(board => {
+                const boardItem = createBoardItem(board);
+                elements.boardsList.appendChild(boardItem);
+            });
+        }
+
+        function createBoardItem(board) {
+            const div = document.createElement('div');
+            div.className = 'board-item';
+            div.setAttribute('data-board-id', board.id);
+            div.innerHTML = `
+                <h4>${board.titulo}</h4>
+                <p>${board.descripcion || 'Sin descripción'}</p>
+            `;
+            
+            div.addEventListener('click', () => showBoard(board));
+            
+            return div;
+        }
+
+        function updateBoardCanvas(cards) {
+            elements.boardCanvas.innerHTML = '';
+            
+            // Asegurar que cards sea un array válido
+            if (!cards || !Array.isArray(cards)) {
+                cards = [];
+            }
+            
+            if (cards.length === 0) {
+                elements.boardCanvas.innerHTML = '<p class="text-center" style="color: #7f8c8d; grid-column: 1 / -1;">No hay tarjetas en esta pizarra</p>';
+                return;
+            }
+            
+            cards.forEach(card => {
+                const cardElement = createCardElement(card);
+                elements.boardCanvas.appendChild(cardElement);
+            });
+        }
+
+        function createCardElement(card) {
+            const div = document.createElement('div');
+            div.className = 'card-item';
+            div.setAttribute('data-card-id', card.id);
+            
+            const createdAt = new Date(card.created_at || Date.now()).toLocaleDateString();
+            
+            div.innerHTML = `
+                <h4>${card.titulo}</h4>
+                <p>${card.contenido}</p>
+                <div class="card-meta">
+                    <span>Por: ${card.usuario_nombre || currentUser?.nombre || 'Usuario'}</span>
+                    <span>${createdAt}</span>
+                </div>
+            `;
+            
+            return div;
+        }
+
+        function updateConnectedUsers(users) {
+            elements.connectedUsers.innerHTML = '';
+            
+            if (users.length === 0) {
+                elements.connectedUsers.innerHTML = '<p class="text-center" style="color: #7f8c8d;">No hay usuarios conectados</p>';
+                return;
+            }
+            
+            users.forEach(user => {
+                const userItem = document.createElement('div');
+                userItem.className = 'user-item';
+                userItem.innerHTML = `
+                    <div class="user-status"></div>
+                    <span>${user.nombre}</span>
+                `;
+                elements.connectedUsers.appendChild(userItem);
+            });
+        }
+
+        function updateConnectionStatus(connected) {
+            const statusEl = elements.connectionStatus;
+            if (connected) {
+                statusEl.className = 'connection-status connected';
+                statusEl.innerHTML = '<div class="connection-indicator"></div><span>Conectado</span>';
+            } else {
+                statusEl.className = 'connection-status disconnected';
+                statusEl.innerHTML = '<div class="connection-indicator"></div><span>Desconectado</span>';
+            }
+        }
+
+        // Modal Functions
+        function showCreateBoardModal() {
+            elements.createBoardModal.classList.remove('hidden');
+        }
+
+        function showAddCardModal() {
+            elements.addCardModal.classList.remove('hidden');
+        }
+
+        function closeModals() {
+            elements.createBoardModal.classList.add('hidden');
+            elements.addCardModal.classList.add('hidden');
+            
+            elements.createBoardForm.reset();
+            elements.addCardForm.reset();
+        }
+
+        // Board and Card Creation
+        async function handleCreateBoard(e) {
+            e.preventDefault();
+            
+            const formData = {
+                titulo: document.getElementById('boardTitleInput').value,
+                descripcion: document.getElementById('boardDescInput').value,
+                grupo_id: document.getElementById('boardGroupSelect').value
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/pizarras`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        showNotification('Pizarra creada exitosamente', 'success');
+                        closeModals();
+                        loadBoards();
+                    } else {
+                        showNotification(result.message || 'Error creando pizarra', 'error');
+                    }
+                } else {
+                    const error = await response.json();
+                    showNotification(error.message || error.error || 'Error creando pizarra', 'error');
+                }
+            } catch (error) {
+                showNotification('Error de conexión', 'error');
+                console.error('Error creating board:', error);
+            }
+        }
+
+        async function handleAddCard(e) {
+            e.preventDefault();
+            
+            if (!currentBoard) {
+                showNotification('No hay pizarra seleccionada', 'error');
+                return;
+            }
+            
+            const formData = {
+                titulo: document.getElementById('cardTitleInput').value,
+                contenido: document.getElementById('cardContentInput').value,
+                pizarra_id: currentBoard.id
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/pizarra/cards`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        showNotification('Tarjeta agregada exitosamente', 'success');
+                        closeModals();
+                        // Card will be added via socket event or reload
+                        loadBoardCards(currentBoard.id);
+                    } else {
+                        showNotification(result.message || 'Error agregando tarjeta', 'error');
+                    }
+                } else {
+                    let errorMessage = 'Error agregando tarjeta';
+                    
+                    // Manejar diferentes tipos de respuesta de error
+                    try {
+                        const errorData = await response.json();
+                        errorMessage = errorData.message || errorData.error || errorMessage;
+                    } catch (jsonError) {
+                        // Si la respuesta no es JSON, usar el status
+                        errorMessage = `Error ${response.status}: ${response.statusText}`;
+                    }
+                    
+                    showNotification(errorMessage, 'error');
+                }
+            } catch (error) {
+                showNotification('Error de conexión', 'error');
+                console.error('Error adding card:', error);
+            }
+        }
+
+        // Notification System
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <strong>${type === 'success' ? '✓' : type === 'error' ? '✗' : 'ℹ'}</strong>
+                ${message}
+            `;
+            
+            elements.notifications.appendChild(notification);
+            
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 5000);
+            
+            notification.addEventListener('click', () => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            });
+        }
+
+        // Funciones de demostración
+        function loadDemoData() {
+            // Simular algunos accesos
+            const demoAccesses = [
+                { nombre: 'Juan Pérez', fecha_hora: new Date().toISOString() },
+                { nombre: 'María García', fecha_hora: new Date(Date.now() - 300000).toISOString() },
+                { nombre: 'Carlos López', fecha_hora: new Date(Date.now() - 600000).toISOString() }
+            ];
+            updateAccessList(demoAccesses);
+
+            // Simular algunas pizarras
+            const demoBoards = [
+                { id: 1, titulo: 'Pizarra de Demo 1', descripcion: 'Esta es una pizarra de demostración' },
+                { id: 2, titulo: 'Pizarra de Demo 2', descripcion: 'Otra pizarra para pruebas' }
+            ];
+            updateBoardsList(demoBoards);
+
+            showNotification('Datos de demostración cargados', 'success');
+        }
+
+        function loadDemoBoardCards() {
+            const demoCards = [
+                {
+                    id: 1,
+                    titulo: 'Tarea de ejemplo 1',
+                    contenido: 'Esta es una tarjeta de demostración para mostrar cómo funciona el sistema.',
+                    created_at: new Date().toISOString(),
+                    usuario_nombre: 'Demo User'
+                },
+                {
+                    id: 2,
+                    titulo: 'Tarea de ejemplo 2',
+                    contenido: 'Otra tarjeta de ejemplo con contenido diferente.',
+                    created_at: new Date(Date.now() - 300000).toISOString(),
+                    usuario_nombre: 'Demo User'
+                }
+            ];
+            updateBoardCanvas(demoCards);
+        }
+
+        // Simular algunos usuarios conectados para demo
+        setTimeout(() => {
+            if (currentUser) {
+                updateConnectedUsers([
+                    { nombre: currentUser.nombre || 'Tú' },
+                    { nombre: 'Usuario Demo 1' },
+                    { nombre: 'Usuario Demo 2' }
+                ]);
+            }
+        }, 2000);
+    </script>
+</body>
+</html>

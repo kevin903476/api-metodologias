@@ -10,7 +10,8 @@ dotenv.config();
 
 const userRouter = require('./routes/userRouter');
 const forumsRouter = require('./routes/forumsRouter');
-const boardRouter = require('./routes/boardRoutes'); 
+const boardRouter = require('./routes/boardRoutes');
+const accessRouter = require('./routes/accessRouter'); 
 
 const app = express();
 
@@ -34,6 +35,7 @@ const PORT = process.env.PORT || 3000;
 app.use('/api', userRouter);
 app.use('/api', forumsRouter);
 app.use('/api', boardRouter);
+app.use('/api', accessRouter);
 
 const server = http.createServer(app);
 const { setSocketIO } = require('./websocket');
